@@ -1,9 +1,9 @@
 # MerMer Default Config
 
-title = "MerMer"
+title = "TideWallet-Backend-Parser"
 
 [base]
-folder = "MerMer-framework"
+folder = "TideWallet-Backend-Parser"
 static = "./build/frontend/"
 debug = false
 
@@ -11,7 +11,20 @@ debug = false
 type = "ethereum"
 
 [database]
-type = "firebase"
+protocol = "postgres"
+host = "postgres"
+port = ""
+user = ""
+password = ""
+dbName = ""
+logging = false
+autoReconnect = true
+ormEnable = true
+  [database.dialectOptions]
+  connectTimeout = 3000
+
+  [database.pool]
+  max = 10
 
 [api]
 pathname = [
