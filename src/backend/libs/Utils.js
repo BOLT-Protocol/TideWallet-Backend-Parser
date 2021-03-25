@@ -1,6 +1,8 @@
 const os = require('os');
+const bitcoin = require('bitcoinjs-lib');
 const fs = require('fs');
 const path = require('path');
+const BigNumber = require('bignumber.js');
 
 const toml = require('toml');
 const i18n = require('i18n');
@@ -553,6 +555,72 @@ class Utils {
         await next();
       }
     };
+  }
+
+  static validateString(str) {
+    return !(!str || typeof str !== 'string' || str.length <= 0);
+  }
+
+  static base64Encode(string) {
+    const buf = Buffer.from(string);
+    return buf.toString('base64');
+  }
+
+  static ripemd160(data) {
+    const hash = crypto.createHash('ripemd160');
+    hash.update(data);
+    return hash.digest();
+  }
+
+  static sha256(message) {
+    const hash = crypto.createHash('sha256');
+    hash.update(message);
+    return hash.digest();
+  }
+
+  static pubkeyToP2WPKHAddress(blockchainID, pubkey) {
+    let address;
+    if (blockchainID === '80000000') {
+      const p2wpkh = bitcoin.payments.p2wpkh({ pubkey, network: bitcoin.networks.bitcoin });
+      address = p2wpkh.address;
+    } else if (blockchainID === '80000001') {
+      const p2wpkh = bitcoin.payments.p2wpkh({ pubkey, network: bitcoin.networks.testnet });
+      address = p2wpkh.address;
+    }
+    return address;
+  }
+
+  static toP2wpkhAddress(blockchainID, pubkey) {
+    // Compressed Public Key to P2WPKH Address
+    const address = this.pubkeyToP2WPKHAddress(blockchainID, pubkey);
+    return address;
+  }
+
+  static is0xPrefixed(value) {
+    return value.toString().slice(0, 2) === '0x';
+  }
+
+  static parse32BytesAddress(address) {
+    if (typeof address !== 'string') return '';
+    const parsedAddr = address.slice(-40);
+    if (Utils.is0xPrefixed(address)) {
+      return `0x${parsedAddr}`;
+    }
+    return parsedAddr;
+  }
+
+  static dividedByDecimal(amount, decimal) {
+    if (typeof decimal === 'undefined' || decimal === null) return '0';
+    let _amount = (amount instanceof BigNumber) ? amount : new BigNumber(amount);
+    if (typeof amount === 'string' && (amount).indexOf('0x') !== -1) _amount = new BigNumber(amount, 16);
+    return _amount.dividedBy(new BigNumber(10 ** decimal)).toFixed();
+  }
+
+  static multipliedByDecimal(amount, decimal) {
+    if (typeof decimal === 'undefined' || decimal === null) return '0';
+    let _amount = (amount instanceof BigNumber) ? amount : new BigNumber(amount);
+    if (typeof amount === 'string' && (amount).indexOf('0x') !== -1) _amount = new BigNumber(amount, 16);
+    return _amount.multipliedBy(new BigNumber(10 ** decimal)).toFixed();
   }
 }
 

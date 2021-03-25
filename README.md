@@ -1,5 +1,5 @@
-# TideWallet-Backend-Crawler
-Blockchain Crawler for TideWallet
+# TideWallet-Backend-Parser
+Blockchain Parser for TideWallet
 
 ## Run Project
 ```

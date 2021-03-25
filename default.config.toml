@@ -8,7 +8,51 @@ static = "./build/frontend/"
 debug = false
 
 [blockchain]
-type = "ethereum"
+# type = 'bitcoin_mainnet'
+# type = 'bitcoin_testnet'
+# type = 'ethereum_mainnet'
+# type = 'ethereum_ropsten'
+type = 'cafeca'
+
+[blockchain.ethereum_mainnet]
+blockchain_id = "8000003C"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
+
+[blockchain.ethereum_ropsten]
+blockchain_id = "8000025B"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
+
+[blockchain.cafeca]
+blockchain_id = "80000CFC"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
+
+[blockchain.bitcoin_mainnet]
+blockchain_id = "80000000"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 18332
+path = "/"
+user = ''
+password = ''
+
+[blockchain.bitcoin_testnet]
+blockchain_id = "80000001"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 18332
+path = "/"
+user = ''
+password = ''
+
 
 [database]
 protocol = "postgres"
@@ -24,7 +68,10 @@ ormEnable = true
   connectTimeout = 3000
 
   [database.pool]
-  max = 10
+  max = 1
+
+[rabbitmq]
+host = "amqp://localhost"
 
 [api]
 pathname = [
