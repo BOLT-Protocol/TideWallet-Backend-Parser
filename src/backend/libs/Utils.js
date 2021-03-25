@@ -155,6 +155,40 @@ class Utils {
     return result;
   }
 
+  static BTCRPC({
+    // eslint-disable-next-line no-shadow
+    protocol, port, hostname, path, data, user, password,
+  }) {
+    const basicAuth = this.base64Encode(`${user}:${password}`);
+    const opt = {
+      protocol,
+      port,
+      hostname,
+      path,
+      headers: { 'content-type': 'application/json', Authorization: `Basic ${basicAuth}` },
+      data,
+      timeout: 1000,
+    };
+    const start = new Date();
+    return ecRequest.post(opt)
+      .then((rs) => {
+        let response = '';
+        try {
+          response = JSON.parse(rs.data);
+        } catch (e) {
+          this.logger.error(`BTCRPC(host: ${hostname} method:${data.method}), error: ${e.message}`);
+          this.logger.error(`BTCRPC(host: ${hostname} method:${data.method}), rs.data.toString(): ${rs.data.toString()}`);
+          return false;
+        }
+        this.logger.log(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
+        return Promise.resolve(response);
+      })
+      .catch((e) => {
+        this.logger.log(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
+        throw e;
+      });
+  }
+
   static ETHRPC({
     // eslint-disable-next-line no-shadow
     protocol, port, hostname, path, data,
@@ -564,18 +598,6 @@ class Utils {
   static base64Encode(string) {
     const buf = Buffer.from(string);
     return buf.toString('base64');
-  }
-
-  static ripemd160(data) {
-    const hash = crypto.createHash('ripemd160');
-    hash.update(data);
-    return hash.digest();
-  }
-
-  static sha256(message) {
-    const hash = crypto.createHash('sha256');
-    hash.update(message);
-    return hash.digest();
   }
 
   static pubkeyToP2WPKHAddress(blockchainID, pubkey) {
