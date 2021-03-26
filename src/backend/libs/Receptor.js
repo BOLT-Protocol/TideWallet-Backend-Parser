@@ -32,17 +32,17 @@ class Receptor extends Bot {
   }
 
   start() {
-    return super.start()
-      .then(() => this.createPem())
-      .then((options) => {
-        const app = new Koa();
-        app.use(staticServe(this.config.base.static))
-          .use(bodyParser({ multipart: true }))
-          .use(this.router.routes())
-          .use(this.router.allowedMethods())
-          .use(helmet());
-        return this.listen({ options, callback: app.callback() });
-      });
+    return super.start();
+    // .then(() => this.createPem())
+    // .then((options) => {
+    //   const app = new Koa();
+    //   app.use(staticServe(this.config.base.static))
+    //     .use(bodyParser({ multipart: true }))
+    //     .use(this.router.routes())
+    //     .use(this.router.allowedMethods())
+    //     .use(helmet());
+    // return this.listen({ options, callback: app.callback() });
+    // });
   }
 
   createPem() {
