@@ -68,7 +68,7 @@ ormEnable = true
   connectTimeout = 3000
 
   [database.pool]
-  max = 1
+  max = 2  #not less than 2
 
 [rabbitmq]
 host = "amqp://localhost"
