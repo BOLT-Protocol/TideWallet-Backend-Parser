@@ -5,7 +5,7 @@ title = "TideWallet-Backend-Parser"
 [base]
 folder = "TideWallet-Backend-Parser"
 static = "./build/frontend/"
-debug = false
+logLevel = 'info'
 
 [blockchain]
 # type = 'bitcoin_mainnet'
