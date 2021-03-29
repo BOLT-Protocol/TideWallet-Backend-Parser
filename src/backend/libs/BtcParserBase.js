@@ -14,7 +14,6 @@ class BtcParserBase extends ParserBase {
     this.tokenTransactionModel = this.database.db.TokenTransaction;
     this.addressTokenTransactionModel = this.database.db.AddressTokenTransaction;
     this.options = {};
-    this.syncInterval = config.syncInterval.pending ? config.syncInterval.pending : 15000;
     this.decimal = 8;
 
     this.updateBalanceAccounts = {};
