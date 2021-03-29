@@ -5,7 +5,7 @@ title = "TideWallet-Backend-Parser"
 [base]
 folder = "TideWallet-Backend-Parser"
 static = "./build/frontend/"
-debug = false
+logLevel = 'info'
 
 [blockchain]
 # type = 'bitcoin_mainnet'
@@ -68,7 +68,7 @@ ormEnable = true
   connectTimeout = 3000
 
   [database.pool]
-  max = 1
+  max = 2  #not less than 2
 
 [rabbitmq]
 host = "amqp://localhost"

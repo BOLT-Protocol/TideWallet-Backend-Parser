@@ -62,11 +62,17 @@ class BtcParserBase extends ParserBase {
     return Promise.reject(data.error);
   }
 
-  async getTransactionByTxidFromPeer(txid) {
+  static async getTransactionByTxidFromPeer(txid) {
     this.logger.debug(`[${this.constructor.name}] getTransactionByTxidFromPeer(${txid})`);
-    const type = 'getTransaction';
-    const options = dvalue.clone(this.options);
-    options.data = this.constructor.cmd({ type, txid });
+
+    const blockchainConfig = Utils.getBlockchainConfig(this.bcid);
+    const options = { ...blockchainConfig };
+    options.data = {
+      jsonrpc: '1.0',
+      method: 'getrawtransaction',
+      params: [txid, true],
+      id: dvalue.randomID(),
+    };
     const checkId = options.data.id;
     const data = await Utils.BTCRPC(options);
     if (data instanceof Object) {
@@ -92,13 +98,8 @@ class BtcParserBase extends ParserBase {
     for (const inputData of tx.vin) {
       // if coinbase, continue
       if (inputData.txid) {
-        const findUXTO = await this.utxoModel.findOne({ where: { txid: inputData.txid } });
-        if (findUXTO) {
-          from = from.plus(new BigNumber(findUXTO.amount));
-        }
-
         // TODO: change use promise all
-        const txInfo = await this.getTransactionByTxidFromPeer(inputData.txid);
+        const txInfo = await BtcParserBase.getTransactionByTxidFromPeer.call(this, inputData.txid);
         if (txInfo && txInfo.vout && txInfo.vout.length > inputData.vout) {
           if (txInfo.vout[inputData.vout].scriptPubKey && txInfo.vout[inputData.vout].scriptPubKey.addresses) {
             source_addresses.push({
@@ -137,10 +138,12 @@ class BtcParserBase extends ParserBase {
       }
     }
 
+    // if from = 0, it from COINBASE
+    const fee = from === new BigNumber(0) ? new BigNumber(0) : new BigNumber(from).minus(new BigNumber(to));
     return {
       from: Utils.multipliedByDecimal(from, this.decimal),
       to: Utils.multipliedByDecimal(to, this.decimal),
-      fee: new BigNumber(from).minus(new BigNumber(to)),
+      fee,
       source_addresses: JSON.stringify(source_addresses),
       destination_addresses: JSON.stringify(destination_addresses),
       note,
@@ -179,7 +182,7 @@ class BtcParserBase extends ParserBase {
           fee: Utils.multipliedByDecimal(fee, currencyInfo.decimals),
           note,
           block: tx.height ? tx.height : null,
-          result: tx.confirmations >= 6 ? true : null,
+          result: tx.confirmations >= 6,
         },
         transaction,
       });
