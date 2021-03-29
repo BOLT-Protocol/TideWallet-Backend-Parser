@@ -644,6 +644,10 @@ class Utils {
     if (typeof amount === 'string' && (amount).indexOf('0x') !== -1) _amount = new BigNumber(amount, 16);
     return _amount.multipliedBy(new BigNumber(10 ** decimal)).toFixed();
   }
+
+  static getBlockchainConfig(blockchain_id) {
+    return Object.values(this.config.blockchain).find((info) => info.blockchain_id === blockchain_id) || false;
+  }
 }
 
 module.exports = Utils;
