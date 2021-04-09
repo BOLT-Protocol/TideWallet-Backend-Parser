@@ -95,18 +95,24 @@ class BtcParserBase extends ParserBase {
     const destination_addresses = [];
     let note = '';
 
-    const arr = [];
     const vins = [];
-    for (const inputData of tx.vin) {
-      // if coinbase, continue
-      if (inputData.txid) {
-        arr.push(BtcParserBase.getTransactionByTxidFromPeer.call(this, inputData.txid));
-        vins.push(inputData);
+    const vinPerCycle = 5;
+    let txInfos = [];
+    for (let i = 0; i < tx.vin.length; i += vinPerCycle) {
+      const arr = [];
+      const cycleVin = tx.vin.slice(i, i + vinPerCycle);
+      for (const inputData of cycleVin) {
+        // if coinbase, continue
+        if (inputData.txid) {
+          arr.push(BtcParserBase.getTransactionByTxidFromPeer.call(this, inputData.txid));
+          vins.push(inputData);
+        }
       }
+      const result = await Promise.all(arr).catch((error) => Promise.reject(error));
+      if (!Array.isArray(result)) { throw new Error(`parseBTCTxAmounts something wrong ${result}`); }
+      txInfos = txInfos.concat(result);
     }
-    const txInfos = await Promise.all(arr).catch((error) => Promise.reject(error));
-
-    if (!txInfos) { throw new Error('parseBTCTxAmounts something wrong'); }
+    if (txInfos.length !== vins.length) { throw new Error('parseBTCTxAmounts something wrong'); }
     for (let i = 0; i < vins.length; i++) {
       const inputData = vins[i];
       const txInfo = txInfos[i];
