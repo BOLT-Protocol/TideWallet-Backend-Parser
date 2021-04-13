@@ -210,7 +210,9 @@ class EthParserBase extends ParserBase {
       const { logs } = receipt;
 
       for (const log of logs) {
-        const { address, data, topics } = log;
+        const { address, topics } = log;
+        let { data } = log;
+        if (data === '0x') data = '0';
         const abi = ethABI[topics[0]];
 
         // 3. check topic has 'Transfer'
