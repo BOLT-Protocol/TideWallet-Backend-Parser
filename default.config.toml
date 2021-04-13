@@ -3,6 +3,7 @@
 title = "TideWallet-Backend-Parser"
 
 [base]
+domain = "https://service.tidewallet.io"
 folder = "TideWallet-Backend-Parser"
 static = "./build/frontend/"
 logLevel = 'info'
