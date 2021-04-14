@@ -255,6 +255,7 @@ class EthParserBase extends ParserBase {
               where: {
                 tokenTransaction_id: tokenTransaction.tokenTransaction_id,
               },
+              returning: true,
             });
             [, [tokenTransaction]] = updateResult;
           }
@@ -298,6 +299,7 @@ class EthParserBase extends ParserBase {
                 where: {
                   accountCurrency_id: acResult.accountCurrency_id,
                 },
+                returning: true,
               });
             }
           }
@@ -341,6 +343,7 @@ class EthParserBase extends ParserBase {
                 where: {
                   accountCurrency_id: acResult.accountCurrency_id,
                 },
+                returning: true,
               });
             }
           }
@@ -447,6 +450,7 @@ class EthParserBase extends ParserBase {
           where: {
             receipt_id: insertReceipt.receipt_id,
           },
+          returning: true,
         });
       }
 
@@ -535,6 +539,7 @@ class EthParserBase extends ParserBase {
           where: {
             addressTokenTransaction_id: result.addressTokenTransaction_id,
           },
+          returning: true,
         });
         [, [result]] = updateResult;
       }
