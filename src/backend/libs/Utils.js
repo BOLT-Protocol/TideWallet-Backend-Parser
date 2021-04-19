@@ -167,7 +167,7 @@ class Utils {
       path,
       headers: { 'content-type': 'application/json', Authorization: `Basic ${basicAuth}` },
       data,
-      timeout: 1000,
+      timeout: 30000,
     };
     const start = new Date();
     return ecRequest.post(opt)
@@ -184,7 +184,7 @@ class Utils {
         return Promise.resolve(response);
       })
       .catch((e) => {
-        this.logger.log(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
+        this.logger.error(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
         throw e;
       });
   }
@@ -200,7 +200,7 @@ class Utils {
       path,
       headers: { 'content-type': 'application/json' },
       data,
-      timeout: 1000,
+      timeout: 3000,
     };
     const start = new Date();
     return ecRequest.post(opt)
@@ -217,7 +217,7 @@ class Utils {
         return Promise.resolve(response);
       })
       .catch((e) => {
-        this.logger.log(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
+        this.logger.error(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
         throw e;
       });
   }
