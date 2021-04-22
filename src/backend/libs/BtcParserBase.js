@@ -200,7 +200,7 @@ class BtcParserBase extends ParserBase {
           fee: Utils.multipliedByDecimal(fee, currencyInfo.decimals),
           note,
           block: tx.height ? tx.height : null,
-          result: tx.confirmations >= 6,
+          result: tx.confirmations >= 6 ? true : null,
         },
         transaction,
       });
