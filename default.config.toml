@@ -13,7 +13,8 @@ logLevel = 'info'
 # type = 'bitcoin_testnet'
 # type = 'ethereum_mainnet'
 # type = 'ethereum_ropsten'
-type = 'cafeca'
+# type = 'cafeca'
+type = 'titan'
 
 [blockchain.ethereum_mainnet]
 blockchain_id = "8000003C"
@@ -53,6 +54,13 @@ port = 18332
 path = "/"
 user = ''
 password = ''
+
+[blockchain.titan]
+blockchain_id = "80001F51"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
 
 
 [database]
