@@ -63,5 +63,5 @@
     "dev": "webpack-dev-server --mode development --open 'google chrome'",
     "start": "bin/main.js"
   },
-  "version": "0.1.0"
+  "version": "1.0.0"
 }
