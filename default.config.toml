@@ -1,17 +1,86 @@
 # MerMer Default Config
 
-title = "MerMer"
+title = "TideWallet-Backend-Parser"
 
 [base]
-folder = "MerMer-framework"
+domain = "https://service.tidewallet.io"
+folder = "TideWallet-Backend-Parser"
 static = "./build/frontend/"
-debug = false
+logLevel = 'info'
 
 [blockchain]
-type = "ethereum"
+# type = 'bitcoin_mainnet'
+# type = 'bitcoin_testnet'
+# type = 'ethereum_mainnet'
+# type = 'ethereum_ropsten'
+# type = 'cafeca'
+type = 'titan'
+
+[blockchain.ethereum_mainnet]
+blockchain_id = "8000003C"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
+
+[blockchain.ethereum_ropsten]
+blockchain_id = "8000025B"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
+
+[blockchain.cafeca]
+blockchain_id = "80000CFC"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
+
+[blockchain.bitcoin_mainnet]
+blockchain_id = "80000000"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 18332
+path = "/"
+user = ''
+password = ''
+
+[blockchain.bitcoin_testnet]
+blockchain_id = "80000001"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 18332
+path = "/"
+user = ''
+password = ''
+
+[blockchain.titan]
+blockchain_id = "80001F51"
+protocol = "http:"
+hostname = "127.0.0.1"
+port = 8545
+path = "/"
+
 
 [database]
-type = "firebase"
+protocol = "postgres"
+host = "postgres"
+port = ""
+user = ""
+password = ""
+dbName = ""
+logging = false
+autoReconnect = true
+ormEnable = true
+  [database.dialectOptions]
+  connectTimeout = 3000
+
+  [database.pool]
+  max = 2  #not less than 2
+
+[rabbitmq]
+host = "amqp://localhost"
 
 [api]
 pathname = [
