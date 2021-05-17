@@ -98,25 +98,31 @@ class BtcParserBase extends ParserBase {
 
     const vins = [];
     const vinPerCycle = 5;
-    let txInfos = [];
+    let syncedTx = [];
+    const syncedTxid = [];
     for (let i = 0; i < tx.vin.length; i += vinPerCycle) {
       const arr = [];
       const cycleVin = tx.vin.slice(i, i + vinPerCycle);
       for (const inputData of cycleVin) {
         // if coinbase, continue
         if (inputData.txid) {
-          arr.push(BtcParserBase.getTransactionByTxidFromPeer.call(this, inputData.txid));
+          let index = syncedTxid.findIndex((txid) => txid === inputData.txid);
+          if (index < 0) {
+            index = syncedTxid.length;
+            arr.push(BtcParserBase.getTransactionByTxidFromPeer.call(this, inputData.txid));
+            syncedTxid.push(inputData.txid);
+          }
+          inputData.syncedTxIndex = index;
           vins.push(inputData);
         }
       }
       const result = await Promise.all(arr).catch((error) => Promise.reject(error));
       if (!Array.isArray(result)) { throw new Error(`parseBTCTxAmounts something wrong ${result}`); }
-      txInfos = txInfos.concat(result);
+      syncedTx = syncedTx.concat(result);
     }
-    if (txInfos.length !== vins.length) { throw new Error('parseBTCTxAmounts something wrong'); }
     for (let i = 0; i < vins.length; i++) {
       const inputData = vins[i];
-      const txInfo = txInfos[i];
+      const txInfo = syncedTx[inputData.syncedTxIndex];
       if (inputData.txid) {
         if (txInfo && txInfo.vout && txInfo.vout.length > inputData.vout) {
           if (txInfo.vout[inputData.vout].scriptPubKey && txInfo.vout[inputData.vout].scriptPubKey.addresses) {
