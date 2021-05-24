@@ -3,6 +3,8 @@ const Bot = require('./Bot');
 // parser
 const BtcParser = require('./BtcParser');
 const BtcTestnetParser = require('./BtcTestnetParser');
+const BchParser = require('./BchParser');
+const BchTestnetParser = require('./BchTestnetParser');
 const EthParser = require('./EthParser');
 const EthRopstenParser = require('./EthRopstenParser');
 const CfcParser = require('./CfcParser');
@@ -15,23 +17,25 @@ class ParserManager extends Bot {
     this._parser = null;
   }
 
-  init({
-    config, database, logger, i18n,
-  }) {
-    return super.init({
-      config, database, logger, i18n,
-    }).then(() => {
-      this._parser = this.createParser();
-      return this;
-    });
+  init({ config, database, logger, i18n }) {
+    return super
+      .init({
+        config,
+        database,
+        logger,
+        i18n,
+      })
+      .then(() => {
+        this._parser = this.createParser();
+        return this;
+      });
   }
 
   start() {
-    return super.start()
-      .then(() => {
-        this.startParser();
-        return this;
-      });
+    return super.start().then(() => {
+      this.startParser();
+      return this;
+    });
   }
 
   createParser() {
@@ -51,6 +55,10 @@ class ParserManager extends Bot {
         return new BtcParser(this.config, this.database, this.logger);
       case 'bitcoin_testnet':
         return new BtcTestnetParser(this.config, this.database, this.logger);
+      case 'bitcoin_cash_mainnet':
+        return new BchParser(this.config, this.database, this.logger);
+      case 'bitcoin_cash_testnet':
+        return new BchTestnetParser(this.config, this.database, this.logger);
       case 'ethereum_mainnet':
         return new EthParser(this.config, this.database, this.logger);
       case 'ethereum_ropsten':
