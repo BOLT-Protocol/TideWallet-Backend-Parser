@@ -1,19 +1,19 @@
-const Bot = require("./Bot");
+const Bot = require('./Bot');
 
 // parser
-const BtcParser = require("./BtcParser");
-const BtcTestnetParser = require("./BtcTestnetParser");
-const BchParser = require("./BchParser");
-const BchTestnetParser = require("./BchTestnetParser");
-const EthParser = require("./EthParser");
-const EthRopstenParser = require("./EthRopstenParser");
-const CfcParser = require("./CfcParser");
-const TtnParser = require("./TtnParser");
+const BtcParser = require('./BtcParser');
+const BtcTestnetParser = require('./BtcTestnetParser');
+const BchParser = require('./BchParser');
+const BchTestnetParser = require('./BchTestnetParser');
+const EthParser = require('./EthParser');
+const EthRopstenParser = require('./EthRopstenParser');
+const CfcParser = require('./CfcParser');
+const TtnParser = require('./TtnParser');
 
 class ParserManager extends Bot {
   constructor() {
     super();
-    this.name = "ParserManager";
+    this.name = 'ParserManager';
     this._parser = null;
   }
 
@@ -51,21 +51,21 @@ class ParserManager extends Bot {
      */
     this.logger.log(type);
     switch (type) {
-      case "bitcoin_mainnet":
+      case 'bitcoin_mainnet':
         return new BtcParser(this.config, this.database, this.logger);
-      case "bitcoin_testnet":
+      case 'bitcoin_testnet':
         return new BtcTestnetParser(this.config, this.database, this.logger);
-      case "bitcoin_cash_mainnet":
+      case 'bitcoin_cash_mainnet':
         return new BchParser(this.config, this.database, this.logger);
-      case "bitcoin_cash_testnet":
+      case 'bitcoin_cash_testnet':
         return new BchTestnetParser(this.config, this.database, this.logger);
-      case "ethereum_mainnet":
+      case 'ethereum_mainnet':
         return new EthParser(this.config, this.database, this.logger);
-      case "ethereum_ropsten":
+      case 'ethereum_ropsten':
         return new EthRopstenParser(this.config, this.database, this.logger);
-      case "cafeca":
+      case 'cafeca':
         return new CfcParser(this.config, this.database, this.logger);
-      case "titan":
+      case 'titan':
         return new TtnParser(this.config, this.database, this.logger);
       default:
         return null;
@@ -73,7 +73,7 @@ class ParserManager extends Bot {
   }
 
   startParser() {
-    if (!this._parser) return Promise.reject(new Error("parser not exist."));
+    if (!this._parser) return Promise.reject(new Error('parser not exist.'));
     this._parser.init();
   }
 }
