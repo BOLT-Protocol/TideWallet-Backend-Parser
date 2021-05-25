@@ -657,7 +657,7 @@ class Utils {
     if (blockchainID === '80000000') {
       const p2wpkh = bitcoin.payments.p2wpkh({ pubkey, network: bitcoin.networks.bitcoin });
       address = p2wpkh.address;
-    } else if (blockchainID === '80000001') {
+    } else if (blockchainID === 'F0000000') {
       const p2wpkh = bitcoin.payments.p2wpkh({ pubkey, network: bitcoin.networks.testnet });
       address = p2wpkh.address;
     }
