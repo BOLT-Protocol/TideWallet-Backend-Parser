@@ -24,7 +24,7 @@ port = 8545
 path = "/"
 
 [blockchain.ethereum_ropsten]
-blockchain_id = "8000025B"
+blockchain_id = "F000003C"
 protocol = "http:"
 hostname = "127.0.0.1"
 port = 8545
@@ -47,7 +47,7 @@ user = ''
 password = ''
 
 [blockchain.bitcoin_testnet]
-blockchain_id = "80000001"
+blockchain_id = "F0000000"
 protocol = "http:"
 hostname = "127.0.0.1"
 port = 18332
@@ -65,7 +65,7 @@ user = ""
 password = ""
 
 [blockchain.bitcoin_cash_testnet]
-blockchain_id = "80000001"
+blockchain_id = "F0000091"
 protocol = "https:"
 hostname = "bitcoincash-testnet.tidewallet.io"
 port = 443

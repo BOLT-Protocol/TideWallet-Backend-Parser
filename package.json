@@ -14,6 +14,7 @@
     "bignumber.js": "^9.0.1",
     "bitcoinjs-lib": "^5.2.0",
     "bs58": "^4.0.1",
+    "bchaddrjs": "^0.5.2",
     "command-line-args": "^5.0.2",
     "dvalue": "^1.0.20",
     "ecrequest": "^1.1.5",
