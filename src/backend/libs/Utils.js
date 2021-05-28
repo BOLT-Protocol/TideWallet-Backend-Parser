@@ -665,19 +665,21 @@ class Utils {
     return address;
   }
 
-  static toP2pkhAddress(blockchainID, pubkey) {
+  static toP2pkhAddress = (blockchainID, pubkey) => {
+    console.log(blockchainID, pubkey);
     try {
-      const _pubkey = pubkey.replace('0x', '');
-      const fingerprint = this.ripemd160(this.sha256(_pubkey.length > 33 ? this.compressedPublicKey(_pubkey) : _pubkey));
-      const findNetwork = Object.values(blockchainNetworks).find((value) => value.blockchain_id === blockchainID);
-      const prefix = Buffer.from((findNetwork.pubKeyHash).toString(16).padStart(2, '0'), 'hex');
+      const _pubkey = Buffer.from(pubkey, "hex");
+      const fingerprint = this.hash160(_pubkey);
+      const findNetwork = Object.values(blockchainNetworks).find(
+        (value) => value.blockchain_id === blockchainID
+      );
+      const prefix = Buffer.from(
+        findNetwork.pubKeyHash.toString(16).padStart(2, "0"),
+        "hex"
+      );
       const hashPubKey = Buffer.concat([prefix, fingerprint]);
       let address = bs58check.encode(hashPubKey);
-      if(blockchainID === '80000091'){ // ++ TODO BCHAddress 2021.5.25 Emily
-        address = bchaddr.toCashAddress(address);
-      } else if (blockchainID === 'F0000091') {
-        address = bchaddr.toCashAddress(address);
-      }
+      address = bchaddr.toCashAddress(address);
       return address;
     } catch (e) {
       console.log('e', e); // -- no console.log
