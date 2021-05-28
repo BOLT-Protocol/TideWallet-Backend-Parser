@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const BigNumber = require('bignumber.js');
 const bchaddr = require('bchaddrjs');
+const bs58check = require('bs58check');
 
 const toml = require('toml');
 const i18n = require('i18n');
@@ -11,6 +12,7 @@ const dvalue = require('dvalue');
 const ecRequest = require('ecrequest');
 const log4js = require('log4js');
 const initialORM = require('../../database/models');
+const blockchainNetworks = require('./data/blockchainNetworks');
 
 class Utils {
   static waterfallPromise(jobs) {
@@ -665,17 +667,17 @@ class Utils {
     return address;
   }
 
-  static toP2pkhAddress = (blockchainID, pubkey) => {
+  static toP2pkhAddress(blockchainID, pubkey) {
     console.log(blockchainID, pubkey);
     try {
-      const _pubkey = Buffer.from(pubkey, "hex");
+      const _pubkey = Buffer.from(pubkey, 'hex');
       const fingerprint = this.hash160(_pubkey);
       const findNetwork = Object.values(blockchainNetworks).find(
-        (value) => value.blockchain_id === blockchainID
+        (value) => value.blockchain_id === blockchainID,
       );
       const prefix = Buffer.from(
-        findNetwork.pubKeyHash.toString(16).padStart(2, "0"),
-        "hex"
+        findNetwork.pubKeyHash.toString(16).padStart(2, '0'),
+        'hex',
       );
       const hashPubKey = Buffer.concat([prefix, fingerprint]);
       let address = bs58check.encode(hashPubKey);

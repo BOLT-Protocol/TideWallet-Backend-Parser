@@ -17,7 +17,9 @@ class ParserManager extends Bot {
     this._parser = null;
   }
 
-  init({ config, database, logger, i18n }) {
+  init({
+    config, database, logger, i18n,
+  }) {
     return super
       .init({
         config,
