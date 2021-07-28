@@ -5,5 +5,5 @@ Blockchain Parser for TideWallet
 ```
 cd /path/to/your/new/project/
 npm install
-npm start
+pm2 start . -i 5 -n TideWallet-Parser
 ```
