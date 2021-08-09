@@ -3,6 +3,8 @@ const bitcoin = require('bitcoinjs-lib');
 const fs = require('fs');
 const path = require('path');
 const BigNumber = require('bignumber.js');
+const bchaddr = require('bchaddrjs');
+const bs58check = require('bs58check');
 
 const toml = require('toml');
 const i18n = require('i18n');
@@ -10,6 +12,7 @@ const dvalue = require('dvalue');
 const ecRequest = require('ecrequest');
 const log4js = require('log4js');
 const initialORM = require('../../database/models');
+const blockchainNetworks = require('./data/blockchainNetworks');
 
 class Utils {
   static waterfallPromise(jobs) {
@@ -153,6 +156,40 @@ class Utils {
     }
 
     return result;
+  }
+
+  static BCHRPC({
+    // eslint-disable-next-line no-shadow
+    protocol, port, hostname, path, data, user, password,
+  }) {
+    const basicAuth = this.base64Encode(`${user}:${password}`);
+    const opt = {
+      protocol,
+      port,
+      hostname,
+      path,
+      headers: { 'content-type': 'application/json', Authorization: `Basic ${basicAuth}` },
+      data,
+      timeout: 30000,
+    };
+    const start = new Date();
+    return ecRequest.post(opt)
+      .then((rs) => {
+        let response = '';
+        try {
+          response = JSON.parse(rs.data);
+        } catch (e) {
+          this.logger.error(`BCHRPC(host: ${hostname} method:${data.method}), error: ${e.message}`);
+          this.logger.error(`BCHRPC(host: ${hostname} method:${data.method}), rs.data.toString(): ${rs.data.toString()}`);
+          return false;
+        }
+        this.logger.log(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
+        return Promise.resolve(response);
+      })
+      .catch((e) => {
+        this.logger.log(`RPC ${opt.hostname} method: ${opt.data.method} response time: ${new Date() - start}ms`);
+        throw e;
+      });
   }
 
   static BTCRPC({
@@ -623,11 +660,33 @@ class Utils {
     if (blockchainID === '80000000') {
       const p2wpkh = bitcoin.payments.p2wpkh({ pubkey, network: bitcoin.networks.bitcoin });
       address = p2wpkh.address;
-    } else if (blockchainID === '80000001') {
+    } else if (blockchainID === 'F0000000') {
       const p2wpkh = bitcoin.payments.p2wpkh({ pubkey, network: bitcoin.networks.testnet });
       address = p2wpkh.address;
     }
     return address;
+  }
+
+  static toP2pkhAddress(blockchainID, pubkey) {
+    console.log(blockchainID, pubkey);
+    try {
+      const _pubkey = Buffer.from(pubkey, 'hex');
+      const fingerprint = this.hash160(_pubkey);
+      const findNetwork = Object.values(blockchainNetworks).find(
+        (value) => value.blockchain_id === blockchainID,
+      );
+      const prefix = Buffer.from(
+        findNetwork.pubKeyHash.toString(16).padStart(2, '0'),
+        'hex',
+      );
+      const hashPubKey = Buffer.concat([prefix, fingerprint]);
+      let address = bs58check.encode(hashPubKey);
+      address = bchaddr.toCashAddress(address);
+      return address;
+    } catch (e) {
+      console.log('e', e); // -- no console.log
+      return e;
+    }
   }
 
   static toP2wpkhAddress(blockchainID, pubkey) {

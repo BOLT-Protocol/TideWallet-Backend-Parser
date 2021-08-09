@@ -14,6 +14,8 @@
     "bignumber.js": "^9.0.1",
     "bitcoinjs-lib": "^5.2.0",
     "bs58": "^4.0.1",
+    "bs58check": "^2.1.2",
+    "bchaddrjs": "^0.5.2",
     "command-line-args": "^5.0.2",
     "dvalue": "^1.0.20",
     "ecrequest": "^1.1.5",
@@ -63,5 +65,5 @@
     "dev": "webpack-dev-server --mode development --open 'google chrome'",
     "start": "bin/main.js"
   },
-  "version": "1.0.0"
+  "version": "1.1.0"
 }
