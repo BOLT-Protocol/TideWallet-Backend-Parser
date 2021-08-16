@@ -96,13 +96,12 @@ class BtcParserBase extends ParserBase {
     const destination_addresses = [];
     let note = '';
 
-    const vins = [];
     const vinPerCycle = 5;
-    let syncedTx = [];
-    const syncedTxid = [];
-    for (let i = 0; i < tx.vin.length; i += vinPerCycle) {
+    for (let vinIndex = 0; vinIndex < tx.vin.length; vinIndex += vinPerCycle) {
+      const vins = [];
       const arr = [];
-      const cycleVin = tx.vin.slice(i, i + vinPerCycle);
+      const cycleVin = tx.vin.slice(vinIndex, vinIndex + vinPerCycle);
+      const syncedTxid = [];
       for (const inputData of cycleVin) {
         // if coinbase, continue
         if (inputData.txid) {
@@ -118,26 +117,26 @@ class BtcParserBase extends ParserBase {
       }
       const result = await Promise.all(arr).catch((error) => Promise.reject(error));
       if (!Array.isArray(result)) { throw new Error(`parseBTCTxAmounts something wrong ${result}`); }
-      syncedTx = syncedTx.concat(result);
-    }
-    for (let i = 0; i < vins.length; i++) {
-      const inputData = vins[i];
-      const txInfo = syncedTx[inputData.syncedTxIndex];
-      if (inputData.txid) {
-        if (txInfo && txInfo.vout && txInfo.vout.length > inputData.vout) {
-          if (txInfo.vout[inputData.vout].scriptPubKey && txInfo.vout[inputData.vout].scriptPubKey.addresses) {
-            source_addresses.push({
-              addresses: txInfo.vout[inputData.vout].scriptPubKey.addresses,
-              amount: Utils.multipliedByDecimal(txInfo.vout[inputData.vout].value, this.decimal),
-            });
-            from = from.plus(new BigNumber(txInfo.vout[inputData.vout].value || '0'));
-          } else if (txInfo.vout[inputData.vout].scriptPubKey && txInfo.vout[inputData.vout].scriptPubKey.type === 'pubkey') {
-            // TODO: need pubkey => P2PK address
-            source_addresses.push({
-              addresses: txInfo.vout[inputData.vout].scriptPubKey.hex,
-              amount: Utils.multipliedByDecimal(txInfo.vout[inputData.vout].value || '0', this.decimal),
-            });
-            from = from.plus(new BigNumber(txInfo.vout[inputData.vout].value || '0'));
+      const txInfos = result;
+      for (let i = 0; i < vins.length; i++) {
+        const inputData = vins[i];
+        const txInfo = txInfos[inputData.syncedTxIndex];
+        if (inputData.txid) {
+          if (txInfo && txInfo.vout && txInfo.vout.length > inputData.vout) {
+            if (txInfo.vout[inputData.vout].scriptPubKey && txInfo.vout[inputData.vout].scriptPubKey.addresses) {
+              source_addresses.push({
+                addresses: txInfo.vout[inputData.vout].scriptPubKey.addresses,
+                amount: Utils.multipliedByDecimal(txInfo.vout[inputData.vout].value, this.decimal),
+              });
+              from = from.plus(new BigNumber(txInfo.vout[inputData.vout].value || '0'));
+            } else if (txInfo.vout[inputData.vout].scriptPubKey && txInfo.vout[inputData.vout].scriptPubKey.type === 'pubkey') {
+              // TODO: need pubkey => P2PK address
+              source_addresses.push({
+                addresses: txInfo.vout[inputData.vout].scriptPubKey.hex,
+                amount: Utils.multipliedByDecimal(txInfo.vout[inputData.vout].value || '0', this.decimal),
+              });
+              from = from.plus(new BigNumber(txInfo.vout[inputData.vout].value || '0'));
+            }
           }
         }
       }
