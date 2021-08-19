@@ -140,25 +140,44 @@ class ParserBase {
     }
   }
 
-  async setAddressTransaction(accountAddress_id, transaction_id, amount, direction) {
+  async setAddressTransaction(accountAddress_id, transaction_id, amount, direction, address) {
     this.logger.debug(`[${this.constructor.name}] setAddressTransaction(${accountAddress_id}, ${transaction_id}, ${direction})`);
     try {
-      const result = await this.addressTransactionModel.findOrCreate({
+      let result = await this.addressTransactionModel.findOne({
         where: {
           currency_id: this.currencyInfo.currency_id,
           accountAddress_id,
           transaction_id,
           amount,
           direction,
+          address,
         },
-        defaults: {
+      });
+      if (!result) {
+        result = await this.addressTransactionModel.create({
           currency_id: this.currencyInfo.currency_id,
           accountAddress_id,
           transaction_id,
           amount,
           direction,
-        },
-      });
+          address,
+        });
+      } else {
+        const updateResult = await this.addressTransactionModel.update({
+          currency_id: this.currencyInfo.currency_id,
+          accountAddress_id,
+          transaction_id,
+          amount,
+          direction,
+          address,
+        }, {
+          where: {
+            addressTokenTransaction_id: result.addressTransaction_id,
+          },
+          returning: true,
+        });
+        [, [result]] = updateResult;
+      }
       return result;
     } catch (error) {
       this.logger.error(`[${this.constructor.name}] setAddressTransaction(${accountAddress_id}, ${transaction_id}, ${direction}) error: ${error}`);

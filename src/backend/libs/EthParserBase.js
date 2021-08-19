@@ -270,6 +270,7 @@ class EthParserBase extends ParserBase {
               tokenTransaction.amount,
               tokenTransaction.tokenTransaction_id,
               0,
+              from,
             );
             const acResult = await this.accountCurrencyModel.findOne({
               where: {
@@ -302,6 +303,47 @@ class EthParserBase extends ParserBase {
                 returning: true,
               });
             }
+          } else {
+            // 7. add mapping table
+            await this.setAddressTokenTransaction(
+              currency.currency_id,
+              '00000000-0000-0000-0000-000000000000',
+              tokenTransaction.amount,
+              tokenTransaction.tokenTransaction_id,
+              0,
+              from,
+            );
+            const acResult = await this.accountCurrencyModel.findOne({
+              where: {
+                account_id: '00000000-0000-0000-0000-000000000000',
+                currency_id: currency.currency_id,
+                number_of_external_key: '0',
+                number_of_internal_key: '0',
+              },
+            });
+            if (!acResult) {
+              await this.accountCurrencyModel.create({
+                accountCurrency_id: uuidv4(),
+                account_id: '00000000-0000-0000-0000-000000000000',
+                currency_id: currency.currency_id,
+                balance: bnAmount.toFixed(),
+                number_of_external_key: '0',
+                number_of_internal_key: '0',
+              });
+            } else {
+              await this.accountCurrencyModel.update({
+                account_id: '00000000-0000-0000-0000-000000000000',
+                currency_id: currency.currency_id,
+                balance: bnAmount.toFixed(),
+                number_of_external_key: '0',
+                number_of_internal_key: '0',
+              }, {
+                where: {
+                  accountCurrency_id: acResult.accountCurrency_id,
+                },
+                returning: true,
+              });
+            }
           }
           // 8. check to address is regist address
           const accountAddressTo = await this.checkRegistAddress(to);
@@ -313,6 +355,7 @@ class EthParserBase extends ParserBase {
               tokenTransaction.amount,
               tokenTransaction.tokenTransaction_id,
               1,
+              to,
             );
 
             const acResult = await this.accountCurrencyModel.findOne({
@@ -335,6 +378,48 @@ class EthParserBase extends ParserBase {
             } else {
               await this.accountCurrencyModel.update({
                 account_id: accountAddressTo.account_id,
+                currency_id: currency.currency_id,
+                balance: bnAmount.toFixed(),
+                number_of_external_key: '0',
+                number_of_internal_key: '0',
+              }, {
+                where: {
+                  accountCurrency_id: acResult.accountCurrency_id,
+                },
+                returning: true,
+              });
+            }
+          } else {
+            // 9. add mapping table
+            await this.setAddressTokenTransaction(
+              currency.currency_id,
+              '00000000-0000-0000-0000-000000000000',
+              tokenTransaction.amount,
+              tokenTransaction.tokenTransaction_id,
+              1,
+              to,
+            );
+
+            const acResult = await this.accountCurrencyModel.findOne({
+              where: {
+                account_id: '00000000-0000-0000-0000-000000000000',
+                currency_id: currency.currency_id,
+                number_of_external_key: '0',
+                number_of_internal_key: '0',
+              },
+            });
+            if (!acResult) {
+              await this.accountCurrencyModel.create({
+                accountCurrency_id: uuidv4(),
+                account_id: '00000000-0000-0000-0000-000000000000',
+                currency_id: currency.currency_id,
+                balance: bnAmount.toFixed(),
+                number_of_external_key: '0',
+                number_of_internal_key: '0',
+              });
+            } else {
+              await this.accountCurrencyModel.update({
+                account_id: '00000000-0000-0000-0000-000000000000',
                 currency_id: currency.currency_id,
                 balance: bnAmount.toFixed(),
                 number_of_external_key: '0',
@@ -467,6 +552,15 @@ class EthParserBase extends ParserBase {
           insertTx.transaction_id,
           insertTx.amount,
           0,
+          from,
+        );
+      } else {
+        await this.setAddressTransaction(
+          '00000000-0000-0000-0000-000000000000',
+          insertTx.transaction_id,
+          insertTx.amount,
+          0,
+          from,
         );
       }
 
@@ -479,6 +573,15 @@ class EthParserBase extends ParserBase {
           insertTx.transaction_id,
           insertTx.amount,
           1,
+          to,
+        );
+      } else {
+        await this.setAddressTransaction(
+          '00000000-0000-0000-0000-000000000000',
+          insertTx.transaction_id,
+          insertTx.amount,
+          0,
+          to,
         );
       }
 
@@ -509,7 +612,7 @@ class EthParserBase extends ParserBase {
     return Promise.reject(data.error);
   }
 
-  async setAddressTokenTransaction(currency_id, accountAddress_id, amount, tokenTransaction_id, direction) {
+  async setAddressTokenTransaction(currency_id, accountAddress_id, amount, tokenTransaction_id, direction, address) {
     this.logger.debug(`[${this.constructor.name}] setAddressTokenTransaction(${currency_id}, ${accountAddress_id}, ${tokenTransaction_id}, ${direction})`);
     try {
       let result = await this.addressTokenTransactionModel.findOne({
@@ -527,6 +630,7 @@ class EthParserBase extends ParserBase {
           tokenTransaction_id,
           amount,
           direction,
+          address,
         });
       } else {
         const updateResult = await this.addressTokenTransactionModel.update({
@@ -535,6 +639,7 @@ class EthParserBase extends ParserBase {
           tokenTransaction_id,
           amount,
           direction,
+          address,
         }, {
           where: {
             addressTokenTransaction_id: result.addressTokenTransaction_id,
