@@ -11,9 +11,6 @@ module.exports = (sequelize, DataTypes) => sequelize.define('PendingTransaction'
     type: DataTypes.STRING,
     allowNull: false,
   },
-  blockAsked: {
-    type: DataTypes.INTEGER,
-  },
   transactions: {
     type: DataTypes.TEXT,
     allowNull: false,
@@ -27,7 +24,4 @@ module.exports = (sequelize, DataTypes) => sequelize.define('PendingTransaction'
   tableName: 'PendingTransaction',
   charset: 'utf8',
   collate: 'utf8_unicode_ci',
-  indexes: [
-    { fields: ['blockchain_id', 'blockAsked'] },
-  ],
 });
