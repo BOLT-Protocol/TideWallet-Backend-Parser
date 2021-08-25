@@ -1,33 +1,36 @@
-module.exports = (sequelize, DataTypes) => sequelize.define('PendingTransaction', {
+module.exports = (sequelize, DataTypes) => sequelize.define('ParseBack', {
   // PK
-  pendingTransaction_id: {
+  parseBack_id: {
     type: DataTypes.BIGINT,
     unique: true,
     primaryKey: true,
     autoIncrement: true,
   },
-  // FK
   blockchain_id: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  blockAsked: {
+  block: {
+    type: DataTypes.BIGINT,
+  },
+  done: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+  start: {
     type: DataTypes.INTEGER,
   },
-  transactions: {
-    type: DataTypes.TEXT,
-    allowNull: false,
-  },
-  timestamp: {
+  retry: {
     type: DataTypes.INTEGER,
-    allowNull: false,
   },
 }, {
   timestamps: false,
-  tableName: 'PendingTransaction',
+  tableName: 'ParseBack',
   charset: 'utf8',
   collate: 'utf8_unicode_ci',
   indexes: [
-    { fields: ['blockchain_id', 'blockAsked'] },
+    { fields: ['block'] },
+    { fields: ['done', 'start'] },
   ],
 });
