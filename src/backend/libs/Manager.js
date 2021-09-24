@@ -9,6 +9,7 @@ const EthParser = require('./EthParser');
 const EthRopstenParser = require('./EthRopstenParser');
 const CfcParser = require('./CfcParser');
 const TtnParser = require('./TtnParser');
+const TtParser = require('./TtParser');
 
 class ParserManager extends Bot {
   constructor() {
@@ -50,6 +51,7 @@ class ParserManager extends Bot {
      * 'ethereum_ropsten',
      * 'cafeca'
      * 'titan'
+     * 'tidetime'
      */
     this.logger.log(type);
     switch (type) {
@@ -67,8 +69,11 @@ class ParserManager extends Bot {
         return new EthRopstenParser(this.config, this.database, this.logger);
       case 'cafeca':
         return new CfcParser(this.config, this.database, this.logger);
-      case 'titan':
-        return new TtnParser(this.config, this.database, this.logger);
+      // temp remove
+      // case 'titan':
+      //   return new TtnParser(this.config, this.database, this.logger);
+      case 'tidetime':
+        return new TtParser(this.config, this.database, this.logger);
       default:
         return null;
     }

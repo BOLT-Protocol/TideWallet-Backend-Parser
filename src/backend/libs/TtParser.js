@@ -1,12 +1,11 @@
 const EthParserBase = require('./EthParserBase');
 
-class TtnParser extends EthParserBase {
+class TtParser extends EthParserBase {
   constructor(config, database, logger) {
-    // ++ need change
     super('80001F51', config, database, logger);
 
-    this.options = config.blockchain.titan;
+    this.options = config.blockchain.tidetime;
   }
 }
 
-module.exports = TtnParser;
+module.exports = TtParser;

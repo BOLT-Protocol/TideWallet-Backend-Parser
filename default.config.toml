@@ -11,10 +11,13 @@ logLevel = 'info'
 [blockchain]
 # type = 'bitcoin_mainnet'
 # type = 'bitcoin_testnet'
+# type = 'bitcoin_cash_mainnet'
+# type = 'bitcoin_cash_testnet'
 # type = 'ethereum_mainnet'
 # type = 'ethereum_ropsten'
 # type = 'cafeca'
-type = 'titan'
+# type = 'titan'
+type = 'tidetime'
 
 [blockchain.ethereum_mainnet]
 blockchain_id = "8000003C"
@@ -73,7 +76,14 @@ path = "/"
 user = ""
 password = ""
 
-[blockchain.titan]
+# [blockchain.titan]
+# blockchain_id = "80001F51"
+# protocol = "http:"
+# hostname = "127.0.0.1"
+# port = 8545
+# path = "/"
+
+[blockchain.tidetime]
 blockchain_id = "80001F51"
 protocol = "http:"
 hostname = "127.0.0.1"
