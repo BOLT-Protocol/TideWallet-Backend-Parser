@@ -88,6 +88,7 @@ class ParserBase {
           },
         ],
         transaction,
+        skipLocked: true,
       });
       return accountAddress;
     } catch (error) {
@@ -153,6 +154,7 @@ class ParserBase {
         address,
       }, {
         transaction,
+        skipLocked: true,
       });
 
       return result;
