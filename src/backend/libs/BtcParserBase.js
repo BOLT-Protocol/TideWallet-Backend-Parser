@@ -314,42 +314,26 @@ class BtcParserBase extends ParserBase {
           this.updateBalanceAccounts[accountAddressFrom.account_id] = { retryCount: 0 };
 
           // 5. add mapping table
-          await this.addressTransactionModel.findOrCreate({
-            where: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: accountAddressFrom.accountAddress_id,
-              transaction_id: findTransaction[0].transaction_id,
-              direction: 0,
-              address: sourceAddress,
-            },
-            defaults: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: accountAddressFrom.accountAddress_id,
-              transaction_id: findTransaction[0].transaction_id,
-              amount: sourceAddressAmount,
-              direction: 0,
-              address: sourceAddress,
-            },
+          await this.addressTransactionModel.create({
+            currency_id: currencyInfo.currency_id,
+            accountAddress_id: accountAddressFrom.accountAddress_id,
+            transaction_id: findTransaction[0].transaction_id,
+            amount: sourceAddressAmount,
+            direction: 0,
+            address: sourceAddress,
+          }, {
             transaction,
           });
         } else {
           // 5. add mapping table
-          await this.addressTransactionModel.findOrCreate({
-            where: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: '00000000-0000-0000-0000-000000000000',
-              transaction_id: findTransaction[0].transaction_id,
-              direction: 0,
-              address: sourceAddress,
-            },
-            defaults: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: '00000000-0000-0000-0000-000000000000',
-              transaction_id: findTransaction[0].transaction_id,
-              amount: sourceAddressAmount,
-              direction: 0,
-              address: sourceAddress,
-            },
+          await this.addressTransactionModel.create({
+            currency_id: currencyInfo.currency_id,
+            accountAddress_id: '00000000-0000-0000-0000-000000000000',
+            transaction_id: findTransaction[0].transaction_id,
+            amount: sourceAddressAmount,
+            direction: 0,
+            address: sourceAddress,
+          }, {
             transaction,
           });
         }
@@ -380,22 +364,14 @@ class BtcParserBase extends ParserBase {
           this.updateBalanceAccounts[accountAddressTo.account_id] = { retryCount: 0 };
 
           // 7. add mapping table
-          await this.addressTransactionModel.findOrCreate({
-            where: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: accountAddressTo.accountAddress_id,
-              transaction_id: findTransaction[0].transaction_id,
-              direction: 1,
-              address: destinationAddress,
-            },
-            defaults: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: accountAddressTo.accountAddress_id,
-              transaction_id: findTransaction[0].transaction_id,
-              amount: destinationAddressAmount,
-              direction: 1,
-              address: destinationAddress,
-            },
+          await this.addressTransactionModel.create({
+            currency_id: currencyInfo.currency_id,
+            accountAddress_id: accountAddressTo.accountAddress_id,
+            transaction_id: findTransaction[0].transaction_id,
+            amount: destinationAddressAmount,
+            direction: 1,
+            address: destinationAddress,
+          }, {
             transaction,
           });
 
@@ -475,22 +451,14 @@ class BtcParserBase extends ParserBase {
           }
         } else {
           // 7. add mapping table
-          await this.addressTransactionModel.findOrCreate({
-            where: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: '00000000-0000-0000-0000-000000000000',
-              transaction_id: findTransaction[0].transaction_id,
-              direction: 1,
-              address: destinationAddress,
-            },
-            defaults: {
-              currency_id: currencyInfo.currency_id,
-              accountAddress_id: '00000000-0000-0000-0000-000000000000',
-              transaction_id: findTransaction[0].transaction_id,
-              amount: destinationAddressAmount,
-              direction: 1,
-              address: destinationAddress,
-            },
+          await this.addressTransactionModel.create({
+            currency_id: currencyInfo.currency_id,
+            accountAddress_id: '00000000-0000-0000-0000-000000000000',
+            transaction_id: findTransaction[0].transaction_id,
+            amount: destinationAddressAmount,
+            direction: 1,
+            address: destinationAddress,
+          }, {
             transaction,
           });
         }
