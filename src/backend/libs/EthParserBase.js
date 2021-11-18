@@ -82,6 +82,7 @@ class EthParserBase extends ParserBase {
           icon,
         }, {
           transaction,
+          skipLocked: true,
         });
       }
       return currencyInDb;
@@ -246,6 +247,7 @@ class EthParserBase extends ParserBase {
               result: receipt.status === '0x1',
             }, {
               transaction: dbTransaction,
+              skipLocked: true,
             });
           } else {
             const updateResult = await this.tokenTransactionModel.update({
@@ -263,6 +265,7 @@ class EthParserBase extends ParserBase {
               },
               returning: true,
               transaction: dbTransaction,
+              skipLocked: true,
             });
             [, [tokenTransaction]] = updateResult;
           }
@@ -299,6 +302,7 @@ class EthParserBase extends ParserBase {
                 number_of_internal_key: '0',
               }, {
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -313,6 +317,7 @@ class EthParserBase extends ParserBase {
                 },
                 returning: true,
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             }
           } else {
@@ -345,6 +350,7 @@ class EthParserBase extends ParserBase {
                 number_of_internal_key: '0',
               }, {
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -359,6 +365,7 @@ class EthParserBase extends ParserBase {
                 },
                 returning: true,
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             }
           }
@@ -395,6 +402,7 @@ class EthParserBase extends ParserBase {
                 number_of_internal_key: '0',
               }, {
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -409,6 +417,7 @@ class EthParserBase extends ParserBase {
                 },
                 returning: true,
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             }
           } else {
@@ -442,6 +451,7 @@ class EthParserBase extends ParserBase {
                 number_of_internal_key: '0',
               }, {
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -456,6 +466,7 @@ class EthParserBase extends ParserBase {
                 },
                 returning: true,
                 transaction: dbTransaction,
+                skipLocked: true,
               });
             }
           }
@@ -517,6 +528,7 @@ class EthParserBase extends ParserBase {
             result: txStatus,
           }, {
             transaction: dbTransaction,
+            skipLocked: true,
           });
         } else {
           const updateResult = await this.transactionModel.update({
@@ -532,6 +544,7 @@ class EthParserBase extends ParserBase {
             },
             returning: true,
             transaction: dbTransaction,
+            skipLocked: true,
           });
 
           [, [insertTx]] = updateResult;
@@ -557,6 +570,7 @@ class EthParserBase extends ParserBase {
             status: parseInt(receipt.status, 16),
           }, {
             transaction: dbTransaction,
+            skipLocked: true,
           });
         } else {
           await this.receiptModel.update({
@@ -574,6 +588,7 @@ class EthParserBase extends ParserBase {
             },
             returning: true,
             transaction: dbTransaction,
+            skipLocked: true,
           });
         }
 
@@ -677,6 +692,7 @@ class EthParserBase extends ParserBase {
           address,
         }, {
           transaction,
+          skipLocked: true,
         });
       } else {
         const updateResult = await this.addressTokenTransactionModel.update({
@@ -692,6 +708,7 @@ class EthParserBase extends ParserBase {
           },
           returning: true,
           transaction,
+          skipLocked: true,
         });
         [, [result]] = updateResult;
       }
