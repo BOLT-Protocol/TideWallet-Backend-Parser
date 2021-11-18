@@ -62,19 +62,19 @@ class ParserBase {
   }
 
   async blockDataFromDB(block_hash) {
-    this.logger.debug(`[${this.constructor.name}] blockNumberFromDB`);
+    this.logger.debug(`[${this.constructor.name}] blockDataFromDB`);
     try {
       const result = await this.blockScannedModel.findOne({
         where: { blockchain_id: this.bcid, block_hash },
       });
       return result;
     } catch (error) {
-      this.logger.error(`[${this.constructor.name}] blockNumberFromDB error ${error}`);
+      this.logger.error(`[${this.constructor.name}] blockDataFromDB error ${error}`);
       return 0;
     }
   }
 
-  async checkRegistAddress(address) {
+  async checkRegistAddress(address, transaction) {
     this.logger.debug(`[${this.constructor.name}] checkRegistAddress(${address})`);
 
     try {
@@ -87,6 +87,7 @@ class ParserBase {
             where: { blockchain_id: this.bcid },
           },
         ],
+        transaction,
       });
       return accountAddress;
     } catch (error) {
@@ -140,44 +141,20 @@ class ParserBase {
     }
   }
 
-  async setAddressTransaction(accountAddress_id, transaction_id, amount, direction, address) {
+  async setAddressTransaction(accountAddress_id, transaction_id, amount, direction, address, transaction) {
     this.logger.debug(`[${this.constructor.name}] setAddressTransaction(${accountAddress_id}, ${transaction_id}, ${direction})`);
     try {
-      let result = await this.addressTransactionModel.findOne({
-        where: {
-          currency_id: this.currencyInfo.currency_id,
-          accountAddress_id,
-          transaction_id,
-          amount,
-          direction,
-          address,
-        },
+      const result = await this.addressTransactionModel.create({
+        currency_id: this.currencyInfo.currency_id,
+        accountAddress_id,
+        transaction_id,
+        amount,
+        direction,
+        address,
+      }, {
+        transaction,
       });
-      if (!result) {
-        result = await this.addressTransactionModel.create({
-          currency_id: this.currencyInfo.currency_id,
-          accountAddress_id,
-          transaction_id,
-          amount,
-          direction,
-          address,
-        });
-      } else {
-        const updateResult = await this.addressTransactionModel.update({
-          currency_id: this.currencyInfo.currency_id,
-          accountAddress_id,
-          transaction_id,
-          amount,
-          direction,
-          address,
-        }, {
-          where: {
-            addressTransaction_id: result.addressTransaction_id,
-          },
-          returning: true,
-        });
-        [, [result]] = updateResult;
-      }
+
       return result;
     } catch (error) {
       this.logger.error(`[${this.constructor.name}] setAddressTransaction(${accountAddress_id}, ${transaction_id}, ${direction}) error: ${error}`);
