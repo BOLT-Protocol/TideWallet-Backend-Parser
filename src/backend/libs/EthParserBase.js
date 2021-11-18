@@ -485,7 +485,9 @@ class EthParserBase extends ParserBase {
       const fee = bnGasPrice.multipliedBy(bnGasUsed).toFixed();
       const currentBlock = this.block ? this.block : await this.blockNumberFromDB();
       let txStatus = null;
-      await this.sequelize.transaction(async (dbTransaction) => {
+      await this.sequelize.transaction({
+        isolationLevel: this.Sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
+      }, async (dbTransaction) => {
         if (receipt.status !== '0x1') {
           txStatus = false;
         } else if (currentBlock - parseInt(tx.blockNumber, 16) >= 6) {
