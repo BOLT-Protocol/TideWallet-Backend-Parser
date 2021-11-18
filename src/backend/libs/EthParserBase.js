@@ -486,7 +486,7 @@ class EthParserBase extends ParserBase {
       const currentBlock = this.block ? this.block : await this.blockNumberFromDB();
       let txStatus = null;
       await this.sequelize.transaction({
-        isolationLevel: this.Sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED,
+        isolationLevel: this.Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
       }, async (dbTransaction) => {
         if (receipt.status !== '0x1') {
           txStatus = false;
