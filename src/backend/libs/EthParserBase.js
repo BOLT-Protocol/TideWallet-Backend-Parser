@@ -564,12 +564,10 @@ class EthParserBase extends ParserBase {
           0,
           from,
         );
-        console.log(res);
       }
 
       // 6. check to address is regist address
       const accountAddressTo = await this.checkRegistAddress(to);
-      console.log('!!!!!accountAddressTo', accountAddressTo);
       if (accountAddressTo) {
         // 7. add mapping table
         await this.setAddressTransaction(
