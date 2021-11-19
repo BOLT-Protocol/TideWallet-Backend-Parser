@@ -620,7 +620,7 @@ class EthParserBase extends ParserBase {
         }
 
         // 6. check to address is regist address
-        const accountAddressTo = await this.checkRegistAddress(to);
+        const accountAddressTo = await this.checkRegistAddress(to, dbTransaction);
         if (accountAddressTo) {
           // 7. add mapping table
           await this.setAddressTransaction(
