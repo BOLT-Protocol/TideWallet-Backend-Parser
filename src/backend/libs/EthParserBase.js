@@ -40,11 +40,10 @@ class EthParserBase extends ParserBase {
     return job;
   }
 
-  async findOrCreateCurrency(contractAddress, transaction) {
+  async findOrCreateCurrency(contractAddress) {
     try {
       let currencyInDb = await this.currencyModel.findOne({
         where: { contract: contractAddress },
-        transaction,
       });
       if (!currencyInDb) {
         const tokenInfoFromPeer = await Promise.all([
@@ -80,9 +79,6 @@ class EthParserBase extends ParserBase {
           total_supply: tokenInfoFromPeer[3],
           contract: contractAddress,
           icon,
-        }, {
-          transaction,
-          skipLocked: true,
         });
       }
       return currencyInDb;
@@ -198,7 +194,7 @@ class EthParserBase extends ParserBase {
     }
   }
 
-  async parseReceiptTopic(receipt, transaction, dbTransaction) {
+  async parseReceiptTopic(receipt, transaction) {
     this.logger.debug(`[${this.constructor.name}] parseReceiptTopic`);
     // step:
     // 1. parse log
@@ -223,7 +219,7 @@ class EthParserBase extends ParserBase {
         // 3. check topic has 'Transfer'
         if (abi && abi.name === 'Transfer' && abi.type === 'event') {
           // 4. if yes, find or create currency by address
-          const currency = await this.findOrCreateCurrency(address, dbTransaction);
+          const currency = await this.findOrCreateCurrency(address);
 
           // 5. set TokenTransaction
           const bnAmount = new BigNumber(data, 16);
@@ -233,7 +229,6 @@ class EthParserBase extends ParserBase {
             where: {
               currency_id: currency.currency_id, transaction_id: transaction.transaction_id,
             },
-            transaction: dbTransaction,
           });
           if (!tokenTransaction) {
             tokenTransaction = await this.tokenTransactionModel.create({
@@ -245,9 +240,6 @@ class EthParserBase extends ParserBase {
               destination_addresses: to,
               amount: bnAmount.toFixed(),
               result: receipt.status === '0x1',
-            }, {
-              transaction: dbTransaction,
-              skipLocked: true,
             });
           } else {
             const updateResult = await this.tokenTransactionModel.update({
@@ -264,14 +256,12 @@ class EthParserBase extends ParserBase {
                 tokenTransaction_id: tokenTransaction.tokenTransaction_id,
               },
               returning: true,
-              transaction: dbTransaction,
-              skipLocked: true,
             });
             [, [tokenTransaction]] = updateResult;
           }
 
           // 6. check from address is regist address
-          const accountAddressFrom = await this.checkRegistAddress(from, dbTransaction);
+          const accountAddressFrom = await this.checkRegistAddress(from);
           if (accountAddressFrom) {
             // 7. add mapping table
             await this.setAddressTokenTransaction(
@@ -281,7 +271,6 @@ class EthParserBase extends ParserBase {
               tokenTransaction.tokenTransaction_id,
               0,
               from,
-              dbTransaction,
             );
             const acResult = await this.accountCurrencyModel.findOne({
               where: {
@@ -290,7 +279,6 @@ class EthParserBase extends ParserBase {
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
               },
-              transaction: dbTransaction,
             });
             if (!acResult) {
               await this.accountCurrencyModel.create({
@@ -300,9 +288,6 @@ class EthParserBase extends ParserBase {
                 balance: bnAmount.toFixed(),
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
-              }, {
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -316,8 +301,6 @@ class EthParserBase extends ParserBase {
                   accountCurrency_id: acResult.accountCurrency_id,
                 },
                 returning: true,
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             }
           } else {
@@ -329,7 +312,6 @@ class EthParserBase extends ParserBase {
               tokenTransaction.tokenTransaction_id,
               0,
               from,
-              dbTransaction,
             );
             const acResult = await this.accountCurrencyModel.findOne({
               where: {
@@ -338,7 +320,6 @@ class EthParserBase extends ParserBase {
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
               },
-              transaction: dbTransaction,
             });
             if (!acResult) {
               await this.accountCurrencyModel.create({
@@ -348,9 +329,6 @@ class EthParserBase extends ParserBase {
                 balance: bnAmount.toFixed(),
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
-              }, {
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -364,13 +342,11 @@ class EthParserBase extends ParserBase {
                   accountCurrency_id: acResult.accountCurrency_id,
                 },
                 returning: true,
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             }
           }
           // 8. check to address is regist address
-          const accountAddressTo = await this.checkRegistAddress(to, dbTransaction);
+          const accountAddressTo = await this.checkRegistAddress(to);
           if (accountAddressTo) {
             // 9. add mapping table
             await this.setAddressTokenTransaction(
@@ -380,7 +356,6 @@ class EthParserBase extends ParserBase {
               tokenTransaction.tokenTransaction_id,
               1,
               to,
-              dbTransaction,
             );
 
             const acResult = await this.accountCurrencyModel.findOne({
@@ -390,7 +365,6 @@ class EthParserBase extends ParserBase {
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
               },
-              transaction: dbTransaction,
             });
             if (!acResult) {
               await this.accountCurrencyModel.create({
@@ -400,9 +374,6 @@ class EthParserBase extends ParserBase {
                 balance: bnAmount.toFixed(),
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
-              }, {
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -416,8 +387,6 @@ class EthParserBase extends ParserBase {
                   accountCurrency_id: acResult.accountCurrency_id,
                 },
                 returning: true,
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             }
           } else {
@@ -429,7 +398,6 @@ class EthParserBase extends ParserBase {
               tokenTransaction.tokenTransaction_id,
               1,
               to,
-              dbTransaction,
             );
 
             const acResult = await this.accountCurrencyModel.findOne({
@@ -439,7 +407,6 @@ class EthParserBase extends ParserBase {
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
               },
-              transaction: dbTransaction,
             });
             if (!acResult) {
               await this.accountCurrencyModel.create({
@@ -449,9 +416,6 @@ class EthParserBase extends ParserBase {
                 balance: bnAmount.toFixed(),
                 number_of_external_key: '0',
                 number_of_internal_key: '0',
-              }, {
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             } else {
               await this.accountCurrencyModel.update({
@@ -465,8 +429,6 @@ class EthParserBase extends ParserBase {
                   accountCurrency_id: acResult.accountCurrency_id,
                 },
                 returning: true,
-                transaction: dbTransaction,
-                skipLocked: true,
               });
             }
           }
@@ -496,152 +458,136 @@ class EthParserBase extends ParserBase {
       const fee = bnGasPrice.multipliedBy(bnGasUsed).toFixed();
       const currentBlock = this.block ? this.block : await this.blockNumberFromDB();
       let txStatus = null;
-      await this.sequelize.transaction({
-        isolationLevel: this.Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
-      }, async (dbTransaction) => {
-        if (receipt.status !== '0x1') {
-          txStatus = false;
-        } else if (currentBlock - parseInt(tx.blockNumber, 16) >= 6) {
-          txStatus = true;
-        }
-        let insertTx = await this.transactionModel.findOne({
-          where: {
-            currency_id: this.currencyInfo.currency_id,
-            txid: tx.hash,
-          },
-          transaction: dbTransaction,
-        });
-        if (!insertTx) {
-          insertTx = await this.transactionModel.create({
-            currency_id: this.currencyInfo.currency_id,
-            txid: tx.hash,
-            timestamp,
-            source_addresses: tx.from,
-            destination_addresses: tx.to ? tx.to : '',
-            amount: bnAmount.toFixed(),
-            fee,
-            note: tx.input,
-            block: parseInt(tx.blockNumber, 16),
-            nonce: parseInt(tx.nonce, 16),
-            gas_price: bnGasPrice.toFixed(),
-            gas_used: bnGasUsed.toFixed(),
-            result: txStatus,
-          }, {
-            transaction: dbTransaction,
-            skipLocked: true,
-          });
-        } else {
-          const updateResult = await this.transactionModel.update({
-            timestamp,
-            fee,
-            block: parseInt(tx.blockNumber, 16),
-            gas_used: bnGasUsed.toFixed(),
-            result: txStatus,
-          }, {
-            where: {
-              currency_id: this.currencyInfo.currency_id,
-              txid: tx.hash,
-            },
-            returning: true,
-            transaction: dbTransaction,
-            skipLocked: true,
-          });
-
-          [, [insertTx]] = updateResult;
-        }
-
-        const insertReceipt = await this.receiptModel.findOne({
-          where: {
-            currency_id: this.currencyInfo.currency_id,
-            transaction_id: insertTx.transaction_id,
-          },
-          transaction: dbTransaction,
-        });
-
-        if (!insertReceipt) {
-          await this.receiptModel.create({
-            transaction_id: insertTx.transaction_id,
-            currency_id: this.currencyInfo.currency_id,
-            contract_address: receipt.contractAddress,
-            cumulative_gas_used: parseInt(receipt.cumulativeGasUsed, 16),
-            gas_used: bnGasUsed.toFixed(),
-            logs: JSON.stringify(receipt.logs),
-            logsBloom: receipt.logsBloom,
-            status: parseInt(receipt.status, 16),
-          }, {
-            transaction: dbTransaction,
-            skipLocked: true,
-          });
-        } else {
-          await this.receiptModel.update({
-            transaction_id: insertTx.transaction_id,
-            currency_id: this.currencyInfo.currency_id,
-            contract_address: receipt.contractAddress,
-            cumulative_gas_used: parseInt(receipt.cumulativeGasUsed, 16),
-            gas_used: bnGasUsed.toFixed(),
-            logs: JSON.stringify(receipt.logs),
-            logsBloom: receipt.logsBloom,
-            status: parseInt(receipt.status, 16),
-          }, {
-            where: {
-              receipt_id: insertReceipt.receipt_id,
-            },
-            returning: true,
-            transaction: dbTransaction,
-            skipLocked: true,
-          });
-        }
-
-        const { from, to } = tx;
-        // 3. parse receipt to check is token transfer
-        await this.parseReceiptTopic(receipt, insertTx, dbTransaction);
-
-        // 4. check from address is regist address
-        const accountAddressFrom = await this.checkRegistAddress(from, dbTransaction);
-        if (accountAddressFrom) {
-          // 5. add mapping table
-          await this.setAddressTransaction(
-            accountAddressFrom.accountAddress_id,
-            insertTx.transaction_id,
-            insertTx.amount,
-            0,
-            from,
-            dbTransaction,
-          );
-        } else {
-          await this.setAddressTransaction(
-            '00000000-0000-0000-0000-000000000000',
-            insertTx.transaction_id,
-            insertTx.amount,
-            0,
-            from,
-            dbTransaction,
-          );
-        }
-
-        // 6. check to address is regist address
-        const accountAddressTo = await this.checkRegistAddress(to, dbTransaction);
-        if (accountAddressTo) {
-          // 7. add mapping table
-          await this.setAddressTransaction(
-            accountAddressTo.accountAddress_id,
-            insertTx.transaction_id,
-            insertTx.amount,
-            1,
-            to,
-            dbTransaction,
-          );
-        } else {
-          await this.setAddressTransaction(
-            '00000000-0000-0000-0000-000000000000',
-            insertTx.transaction_id,
-            insertTx.amount,
-            0,
-            to,
-            dbTransaction,
-          );
-        }
+      if (receipt.status !== '0x1') {
+        txStatus = false;
+      } else if (currentBlock - parseInt(tx.blockNumber, 16) >= 6) {
+        txStatus = true;
+      }
+      let insertTx = await this.transactionModel.findOne({
+        where: {
+          currency_id: this.currencyInfo.currency_id,
+          txid: tx.hash,
+        },
       });
+      if (!insertTx) {
+        insertTx = await this.transactionModel.create({
+          currency_id: this.currencyInfo.currency_id,
+          txid: tx.hash,
+          timestamp,
+          source_addresses: tx.from,
+          destination_addresses: tx.to ? tx.to : '',
+          amount: bnAmount.toFixed(),
+          fee,
+          note: tx.input,
+          block: parseInt(tx.blockNumber, 16),
+          nonce: parseInt(tx.nonce, 16),
+          gas_price: bnGasPrice.toFixed(),
+          gas_used: bnGasUsed.toFixed(),
+          result: txStatus,
+        });
+      } else {
+        const updateResult = await this.transactionModel.update({
+          timestamp,
+          fee,
+          block: parseInt(tx.blockNumber, 16),
+          gas_used: bnGasUsed.toFixed(),
+          result: txStatus,
+        }, {
+          where: {
+            currency_id: this.currencyInfo.currency_id,
+            txid: tx.hash,
+          },
+          returning: true,
+          skipLocked: true,
+        });
+
+        [, [insertTx]] = updateResult;
+      }
+
+      const insertReceipt = await this.receiptModel.findOne({
+        where: {
+          currency_id: this.currencyInfo.currency_id,
+          transaction_id: insertTx.transaction_id,
+        },
+      });
+
+      if (!insertReceipt) {
+        await this.receiptModel.create({
+          transaction_id: insertTx.transaction_id,
+          currency_id: this.currencyInfo.currency_id,
+          contract_address: receipt.contractAddress,
+          cumulative_gas_used: parseInt(receipt.cumulativeGasUsed, 16),
+          gas_used: bnGasUsed.toFixed(),
+          logs: JSON.stringify(receipt.logs),
+          logsBloom: receipt.logsBloom,
+          status: parseInt(receipt.status, 16),
+        });
+      } else {
+        await this.receiptModel.update({
+          transaction_id: insertTx.transaction_id,
+          currency_id: this.currencyInfo.currency_id,
+          contract_address: receipt.contractAddress,
+          cumulative_gas_used: parseInt(receipt.cumulativeGasUsed, 16),
+          gas_used: bnGasUsed.toFixed(),
+          logs: JSON.stringify(receipt.logs),
+          logsBloom: receipt.logsBloom,
+          status: parseInt(receipt.status, 16),
+        }, {
+          where: {
+            receipt_id: insertReceipt.receipt_id,
+          },
+          returning: true,
+          skipLocked: true,
+        });
+      }
+
+      const { from, to } = tx;
+      // 3. parse receipt to check is token transfer
+      await this.parseReceiptTopic(receipt, insertTx);
+
+      // 4. check from address is regist address
+      const accountAddressFrom = await this.checkRegistAddress(from);
+      if (accountAddressFrom) {
+        // 5. add mapping table
+        await this.setAddressTransaction(
+          accountAddressFrom.accountAddress_id,
+          insertTx.transaction_id,
+          insertTx.amount,
+          0,
+          from,
+        );
+      } else {
+        const res = await this.setAddressTransaction(
+          '00000000-0000-0000-0000-000000000000',
+          insertTx.transaction_id,
+          insertTx.amount,
+          0,
+          from,
+        );
+        console.log(res);
+      }
+
+      // 6. check to address is regist address
+      const accountAddressTo = await this.checkRegistAddress(to);
+      console.log('!!!!!accountAddressTo', accountAddressTo);
+      if (accountAddressTo) {
+        // 7. add mapping table
+        await this.setAddressTransaction(
+          accountAddressTo.accountAddress_id,
+          insertTx.transaction_id,
+          insertTx.amount,
+          1,
+          to,
+        );
+      } else {
+        await this.setAddressTransaction(
+          '00000000-0000-0000-0000-000000000000',
+          insertTx.transaction_id,
+          insertTx.amount,
+          0,
+          to,
+        );
+      }
 
       return true;
     } catch (error) {
@@ -670,16 +616,16 @@ class EthParserBase extends ParserBase {
     return Promise.reject(data.error);
   }
 
-  async setAddressTokenTransaction(currency_id, accountAddress_id, amount, tokenTransaction_id, direction, address, transaction) {
-    this.logger.debug(`[${this.constructor.name}] setAddressTokenTransaction(${currency_id}, ${accountAddress_id}, ${tokenTransaction_id}, ${direction})`);
+  async setAddressTokenTransaction(currency_id, accountAddress_id, amount, tokenTransaction_id, direction, address) {
+    this.logger.debug(`[${this.constructor.name}] setAddressTokenTransaction(${currency_id}, ${accountAddress_id}, ${tokenTransaction_id}, ${direction}), ${address}`);
     try {
       let result = await this.addressTokenTransactionModel.findOne({
         where: {
           currency_id,
-          accountAddress_id,
           tokenTransaction_id,
+          direction,
+          address,
         },
-        transaction,
       });
 
       if (!result) {
@@ -690,9 +636,6 @@ class EthParserBase extends ParserBase {
           amount,
           direction,
           address,
-        }, {
-          transaction,
-          skipLocked: true,
         });
       } else {
         const updateResult = await this.addressTokenTransactionModel.update({
@@ -707,8 +650,6 @@ class EthParserBase extends ParserBase {
             addressTokenTransaction_id: result.addressTokenTransaction_id,
           },
           returning: true,
-          transaction,
-          skipLocked: true,
         });
         [, [result]] = updateResult;
       }
